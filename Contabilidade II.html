@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto de Implantação | Contabilidade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right, #19547b, #ffd89b);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* Glassmorphism Design System - Enhanced */
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.07),
+                0 10px 20px rgba(31, 38, 135, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            pointer-events: none;
+        }
+
+        .glass-panel:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 8px 16px rgba(0, 0, 0, 0.1),
+                0 20px 40px rgba(31, 38, 135, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .glass-panel.expanded {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.12),
+                0 24px 48px rgba(31, 38, 135, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .panel-header {
+            width: 100%;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        .panel-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .panel-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .panel-icon {
+            font-size: 1.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-panel:hover .panel-icon {
+            transform: scale(1.1);
+        }
+
+        .panel-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #1e293b;
+            transition: color 0.3s ease;
+        }
+
+        .glass-panel:hover .panel-title {
+            color: #0f172a;
+        }
+
+        .chevron {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #475569;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .glass-panel.expanded .chevron {
+            transform: rotate(180deg);
+        }
+
+        .glass-panel:hover .chevron {
+            color: #334155;
+        }
+
+        .panel-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(18px);
+        }
+
+        .glass-panel.expanded .panel-content {
+            max-height: 2000px;
+        }
+
+        .panel-items {
+            padding: 1.5rem;
+            space: 0.75rem;
+        }
+
+        .panel-item {
+            display: flex;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .panel-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .panel-item:hover {
+            transform: translateX(4px);
+        }
+
+        .panel-bullet {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            margin-top: 0.5rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 12px rgba(251, 191, 36, 0.5);
+        }
+
+        .panel-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #475569;
+            transition: color 0.3s ease;
+        }
+
+        .glass-panel:hover .panel-text {
+            color: #334155;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 3rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .section::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom-right, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            border-radius: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .section:hover::after {
+            opacity: 1;
+        }
+
+        .section-border {
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .section-warm {
+            background: linear-gradient(135deg, #19547b 0%, #2d7a9e 50%, #ffd89b 100%);
+        }
+
+        .section-cool {
+            background: linear-gradient(to right, #2C5364, #203A43, #0F2027);
+        }
+
+        .section-content {
+            max-width: 56rem;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .section-icon {
+            font-size: 2.25rem;
+            margin-top: 0.25rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover .section-icon {
+            transform: scale(1.1);
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 3rem;
+            line-height: 1.2;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover .section-title {
+            transform: translateX(4px);
+        }
+
+        .section-description {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 1.125rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            transition: color 0.3s ease;
+        }
+
+        .section:hover .section-description {
+            color: white;
+        }
+
+        .section-panels {
+            display: space-y-1;
+        }
+
+        /* Header */
+        header {
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .header-content {
+            max-width: 56rem;
+            margin: 0 auto;
+        }
+
+        .main-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 3.5rem;
+            line-height: 1.2;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .main-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        /* Main Container */
+        main {
+            padding: 0 1.5rem 4rem;
+        }
+
+        .main-content {
+            max-width: 56rem;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-text {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 500;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: #64748b;
+        }
+
+        /* Animations */
+        @keyframes slideDownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .glass-panel {
+            animation: slideDownFade 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.25rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .panel-title {
+                font-size: 1.125rem;
+            }
+
+            .section {
+                padding: 2rem 1rem;
+            }
+
+            .panel-header {
+                padding: 1rem;
+            }
+
+            .panel-items {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <h1 class="main-title">Projeto de Implantação</h1>
+            <p class="main-subtitle">Contabilidade - Integração de Processos e Configurações</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="main-content">
+            <!-- Integração Escrita Fiscal -->
+            <section class="section section-warm">
+                <div class="section-border"></div>
+                <div class="section-content">
+                    <div class="section-header">
+                        <span class="section-icon">📋</span>
+                        <div>
+                            <h2 class="section-title">Integração Escrita Fiscal</h2>
+                            <p class="section-description">Configuração automática de notas fiscais, impostos e baixas</p>
+                        </div>
+                    </div>
+                    <div class="section-panels">
+                        <!-- Panel 1 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">📄</span>
+                                    <span class="panel-title">Notas Fiscais (Acumuladores)</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Integra automaticamente ao importar o XML</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Possui a configuração de integração nos acumuladores (já vem configurado)</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Cria contas automaticamente para clientes e fornecedores</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Integra automaticamente para conta sintética de clientes e fornecedores</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">⚙️</span>
+                                    <span class="panel-title">Impostos (Cadastro de Impostos)</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Arquivos/Impostos aba Contabilidade - Possui a configuração para integração dos impostos (provisão e pagamento)</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Já vem configurado para quem usa plano padrão Domínio</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">💼</span>
+                                    <span class="panel-title">Pagamento de Impostos</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Movimentos/pagamento de impostos (manual)</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Movimentos/pagamento de impostos via e-cac (importado do e-cac)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">📋</span>
+                                    <span class="panel-title">Baixa de Notas Fiscais (Duplicatas)</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">COMPRAS: //MOVIMENTOS/BAIXAS/ENTRADAS</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">VENDAS: //MOVIMENTOS/BAIXAS/SAÍDAS</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">SERVIÇOS: //MOVIMENTOS/BAIXAS/SERVIÇOS</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 5 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">⚙️</span>
+                                    <span class="panel-title">Regerar Lançamentos Contábeis</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//UTILITÁRIOS/REGERAR/LANÇAMENTOS CONTÁBEIS - Apenas para notas que não subirem automaticamente para o balancete</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Integração Folha de Pagamentos -->
+            <section class="section section-cool">
+                <div class="section-border"></div>
+                <div class="section-content">
+                    <div class="section-header">
+                        <span class="section-icon">💼</span>
+                        <div>
+                            <h2 class="section-title">Integração Folha de Pagamentos</h2>
+                            <p class="section-description">Configuração e integração de folha de pagamentos com contabilidade</p>
+                        </div>
+                    </div>
+                    <div class="section-panels">
+                        <!-- Panel 1 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">⚙️</span>
+                                    <span class="panel-title">Configurar Parâmetros da Empresa</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Controle/Parâmetros aba //Contabilidade - Marcar o campo "Gera lançamentos contábeis"</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Avaliar demais campos (já vem configurados)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">📋</span>
+                                    <span class="panel-title">Replicar Configurações</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Ativar a empresa 9995 - Padrão Geral</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Arquivo/Contabilidade/Configurar Integração</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Clicar em [Copiar] e selecionar a opção "Todas as contas"</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Clicar no botão Empresas e selecionar a empresa destino das configurações....[Ok]</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Fazer isso a primeira vez para todas as empresas</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">📄</span>
+                                    <span class="panel-title">Integração da Folha</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Processos/Integração Contábil - Informar o período</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Clicar em [Gerar]</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Fazer este passo mensalmente ao encerrar e conferir a folha</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">⚙️</span>
+                                    <span class="panel-title">Configuração de Novas Rubricas</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Arquivos/Contabilidade/Configurar Integração</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Selecionar a aba desejada</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Clicar em [Novo] e informar o nome da rubrica que será contabilizada</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Informar o código da conta débito via F2 e o código da conta crédito via F2</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Informar o histórico</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Selecionar a rubrica no quadro Rubricas Disponíveis e clicar na seta para passar para o quadro de Rubricas Selecionadas.....[Gravar]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 5 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">💼</span>
+                                    <span class="panel-title">Integração dos Pagamentos da Folha</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Processos/Pagamentos - Selecionar a folha ou o encargo</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">Clicar em [pagar] e informar a data de pagamento e valor pago</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">No quadro Contabilidade, clicar em [Gerar]</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patrimônio -->
+            <section class="section section-warm">
+                <div class="section-border"></div>
+                <div class="section-content">
+                    <div class="section-header">
+                        <span class="section-icon">🏢</span>
+                        <div>
+                            <h2 class="section-title">Patrimônio</h2>
+                            <p class="section-description">Gerenciamento de ativos e depreciação</p>
+                        </div>
+                    </div>
+                    <div class="section-panels">
+                        <!-- Panel 1 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">📚</span>
+                                    <span class="panel-title">Integração da Depreciação</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Processos/Integração Contábil - Configuração de integração já pronta para quem usa plano padrão Domínio</p>
+                                    </div>
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Arquivos/Contas Patrimoniais aba //Contabilidade</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LALUR -->
+            <section class="section section-cool">
+                <div class="section-border"></div>
+                <div class="section-content">
+                    <div class="section-header">
+                        <span class="section-icon">📊</span>
+                        <div>
+                            <h2 class="section-title">LALUR</h2>
+                            <p class="section-description">Livro de Apuração do Lucro Real</p>
+                        </div>
+                    </div>
+                    <div class="section-panels">
+                        <!-- Panel 1 -->
+                        <div class="glass-panel" onclick="togglePanel(this)">
+                            <div class="panel-header">
+                                <div class="panel-title-group">
+                                    <span class="panel-icon">📚</span>
+                                    <span class="panel-title">Integração do IRPJ e CSLL</span>
+                                </div>
+                                <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="panel-content">
+                                <div class="panel-items">
+                                    <div class="panel-item">
+                                        <div class="panel-bullet"></div>
+                                        <p class="panel-text">//Movimentos/Integração Contábil - Integração do IRPJ e CSLL</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-text">Projeto de Implantação - Contabilidade v2.0 | Glassmorphism Premium Edition</p>
+    </footer>
+
+    <script>
+        function togglePanel(element) {
+            const isExpanded = element.classList.contains('expanded');
+            
+            // Close all other panels
+            document.querySelectorAll('.glass-panel').forEach(panel => {
+                if (panel !== element && panel.classList.contains('expanded')) {
+                    panel.classList.remove('expanded');
+                }
+            });
+            
+            // Toggle current panel
+            element.classList.toggle('expanded');
+        }
+
+        // Add stagger animation delay to panels
+        document.querySelectorAll('.glass-panel').forEach((panel, index) => {
+            panel.style.animationDelay = `${index * 100}ms`;
+        });
+    </script>
+</body>
+</html>
